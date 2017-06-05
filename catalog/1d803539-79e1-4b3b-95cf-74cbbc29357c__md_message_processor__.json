@@ -1,0 +1,16 @@
+{
+    "inputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "pudding_json"
+        }
+    },
+    "outputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "pudding_bson"
+        }
+    },
+    "id": "1d803539-79e1-4b3b-95cf-74cbbc29357c",
+    "version": "5.2.0.0"
+}
