@@ -9,30 +9,42 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" basePath="api" doc:name="HTTP Listener Configuration"/>
-    <http:request-config name="BBC_HTTP_Request_Configuration" host="www.bbc.co.uk" port="80" doc:name="HTTP Request Configuration"/>
-    <mongo:config name="Mongo_DB" username="notused" database="MuleDb" doc:name="Mongo DB"/>
-    <flow name="testFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/helloworld" doc:name="HTTP"/>
-        <logger level="INFO" doc:name="Logger"/>
+    <flow name="BBC">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/bbc" doc:name="HTTP"/>
+        <logger level="INFO" doc:name="Logger" message="test"/>
         <http:request config-ref="BBC_HTTP_Request_Configuration" path="news" method="GET" doc:name="HTTP"/>
     </flow>
+    <flow name="FakeJsonAPI">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/jsonApi" doc:name="HTTP"/>
+        <logger level="INFO" doc:name="Logger" message="test"/>
+        <http:request config-ref="jsonplaceholder_HTTP_Request_Configuration" path="/users" method="GET" doc:name="HTTP"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="5783f9fe-4f50-45e6-b84a-a399f0bae6a8">
+            <dw:input-payload doc:sample="jsonplaceholder1.json" mimeType="application/json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map ((payload01 , indexOfPayload01) -> {
+	name: dasherize payload01.name
+})]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+       
     <flow name="MongoDB_Flow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/mongodb" allowedMethods="POST" doc:name="HTTP"/>
         <logger message="#[message.payload]" level="INFO" doc:name="Logger"/>
-        <set-variable variableName="now" value="#[server.dateTime]" doc:name="Variable"/>
+        <set-variable variableName="now" value="#[server.dateTime]" doc:name="Set dateTime flow variable"/>
         <dw:transform-message doc:name="Transform Message" metadata:id="1d803539-79e1-4b3b-95cf-74cbbc29357c">
-            <dw:input-payload doc:sample="sample_data\string.dwl" mimeType="application/json"/>
+            <dw:input-payload doc:sample="pudding.json" mimeType="application/json"/>
+            <dw:input-variable doc:sample="sample_data\DateTime_6.dwl" variableName="now"/>
             <dw:set-payload><![CDATA[%dw 1.0
 %output application/json
 ---
 {
-	pudding: payload.pudding,
-	amount: payload.amount,
+	data: payload,
 	createdTimestamp: flowVars.now as :string
 }]]></dw:set-payload>
         </dw:transform-message>
-        <mongo:json-to-dbobject doc:name="Mongo DB"/>
-        <mongo:insert-object config-ref="Mongo_DB" collection="pudding" doc:name="Mongo DB"/>
+        <mongo:json-to-dbobject doc:name="Json to dbobject"/>
+        <mongo:insert-object config-ref="Mongo_DB" collection="pudding" doc:name="Insert into Mongo DB pudding collection"/>
     </flow>
 </mule>
