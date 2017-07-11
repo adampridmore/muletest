@@ -23,7 +23,8 @@
 		<!-- Http Logger shows wire traffic on DEBUG -->
 		<!-- <AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger" level="WARN"/> -->
 		<AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger" level="DEBUG"/>
-	
+		<!-- <AsyncLogger name="com.ning.http.client.providers.grizzly" level="DEBUG"/> -->
+			
 		<!-- JDBC Logger shows queries and parameters values on DEBUG -->
 		<AsyncLogger name="com.mulesoft.mule.transport.jdbc" level="WARN"/>
     
